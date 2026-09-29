@@ -1,0 +1,33 @@
+# Every number the pipeline uses lives here. DVC watches this file:
+# change a value, run `dvc repro`, and only the stages that use it run again.
+
+data:
+  url: https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+
+split:
+  test_size: 0.2   # 20% of customers kept aside for the final score
+  val_size: 0.2    # 20% used to choose the decision threshold
+  seed: 42 # random seed for reproducibility 
+
+model:
+  type: logreg        # hgb (gradient boosting) or logreg (logistic regression)
+  logreg:
+    C: 1.0
+  hgb:
+    learning_rate: 0.05
+    max_iter: 300
+    max_leaf_nodes: 15
+
+# Business costs, in dollars. Set by the business, not by the data scientist.
+cost:
+  false_negative: 300   # a churner we missed: lost revenue
+  false_positive: 60    # a retention offer sent to someone who would have stayed
+
+# The quality gate: below this, the pipeline fails and nothing is promoted.
+gate:
+  min_roc_auc: 0.80
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment: telco-churn
+  registered_model: churn-classifier
