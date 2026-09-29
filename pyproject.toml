@@ -1,0 +1,49 @@
+[project]
+name = "churnops"
+version = "0.1.0"
+description = "Customer churn model with a full MLOps pipeline: DVC, MLflow, tests, CI/CD, Docker, drift monitoring"
+readme = "README.md"
+authors = [
+    { name = "Dr Maliki Moustapha", email = "ayindemalik1@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "joblib>=1.6.0",
+    "pandas>=3.0.6",
+    "pyarrow>=25.0.1",
+    "pyyaml>=6.0.3",
+    "scikit-learn>=1.9.1",
+    "typer>=0.27.2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+churnops = "churnops.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.11.1,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+]
+train = [
+    "dvc>=3.67.1",
+    "mlflow>=3.16.1",
+    "pandera>=0.33.1",
+]
+
+[tool.uv]
+# `uv sync` installs everything on your laptop. Docker installs only what
+# serving needs (`--no-default-groups`), which keeps the image small.
+default-groups = ["dev", "train"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

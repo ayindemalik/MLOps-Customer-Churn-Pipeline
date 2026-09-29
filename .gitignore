@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# REPLACED
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# MLflow tracking data (local to each machine)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Outputs rebuilt by commands
+reports/drift.csv
+
+# Private
+notes/
+.env
