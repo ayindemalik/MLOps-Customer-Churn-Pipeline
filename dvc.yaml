@@ -1,0 +1,43 @@
+stages:
+  fetch:
+    cmd: uv run churnops fetch
+    params:
+      - data.url
+    outs:
+      - data/raw/telco.csv
+
+  prepare:
+    cmd: uv run churnops prepare
+    deps:
+      - data/raw/telco.csv
+      - src/churnops/data.py
+      - src/churnops/schema.py
+    params:
+      - split
+    outs:
+      - data/processed
+
+  train:
+    cmd: uv run churnops train
+    deps:
+      - data/processed
+      - src/churnops/features.py
+      - src/churnops/train.py
+      - src/churnops/metrics.py
+    params:
+      - model
+      - cost
+    outs:
+      - models/model.joblib
+
+  evaluate:
+    cmd: uv run churnops evaluate
+    deps:
+      - models/model.joblib
+      - data/processed
+      - src/churnops/evaluate.py
+    params:
+      - gate
+    metrics:
+      - reports/metrics.json:
+          cache: false

@@ -1,0 +1,103 @@
+schema: '2.0'
+stages:
+  fetch:
+    cmd: uv run churnops fetch
+    params:
+      params.yaml:
+        data.url: 
+          https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+    outs:
+    - path: data/raw/telco.csv
+      hash: md5
+      md5: 3b0bfab28a8101b4e4fdd08025a5c235
+      size: 970457
+  prepare:
+    cmd: uv run churnops prepare
+    deps:
+    - path: data/raw/telco.csv
+      hash: md5
+      md5: 3b0bfab28a8101b4e4fdd08025a5c235
+      size: 970457
+    - path: src/churnops/data.py
+      hash: md5
+      md5: e7c405b546d5edf7d2091a35cc3436d0
+      size: 1794
+    - path: src/churnops/schema.py
+      hash: md5
+      md5: 31ee8f57d7506f83e96da5dc40205a9b
+      size: 1953
+    params:
+      params.yaml:
+        split:
+          test_size: 0.2
+          val_size: 0.2
+          seed: 42
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 29095250752f762f8858688f48c6c7e8.dir
+      size: 226587
+      nfiles: 3
+  train:
+    cmd: uv run churnops train
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 29095250752f762f8858688f48c6c7e8.dir
+      size: 226587
+      nfiles: 3
+    - path: src/churnops/features.py
+      hash: md5
+      md5: 3e6c0d243621a5bd3cfcd028eb984f49
+      size: 1406
+    - path: src/churnops/metrics.py
+      hash: md5
+      md5: 2d7a082535c9fc8107dd750b9e2e3941
+      size: 1461
+    - path: src/churnops/train.py
+      hash: md5
+      md5: a4170bab9496e540431156e5f4b461c6
+      size: 2805
+    params:
+      params.yaml:
+        cost:
+          false_negative: 300
+          false_positive: 60
+        model:
+          type: logreg
+          logreg:
+            C: 1.0
+          hgb:
+            learning_rate: 0.05
+            max_iter: 300
+            max_leaf_nodes: 15
+    outs:
+    - path: models/model.joblib
+      hash: md5
+      md5: a6e29ec830716f909d3937355e1eec88
+      size: 7609
+  evaluate:
+    cmd: uv run churnops evaluate
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 29095250752f762f8858688f48c6c7e8.dir
+      size: 226587
+      nfiles: 3
+    - path: models/model.joblib
+      hash: md5
+      md5: a6e29ec830716f909d3937355e1eec88
+      size: 7609
+    - path: src/churnops/evaluate.py
+      hash: md5
+      md5: 3432e3113d95748d9ce283f62a01c04b
+      size: 1980
+    params:
+      params.yaml:
+        gate:
+          min_roc_auc: 0.8
+    outs:
+    - path: reports/metrics.json
+      hash: md5
+      md5: 2e757b072baa2871cdedfe40b5568700
+      size: 233

@@ -14,7 +14,7 @@ The model is deliberately simple. The point of this repository is everything tha
 
 ```powershell
 docker run --rm -p 8000:8000 ghcr.io/ayindemalik/mlops-customer-churn-pipeline:latest
-# then open http://127.0.0.1:8000/docs
+# then open http://127.0.0.1:8015/docs
 ```
 
 ---
@@ -89,7 +89,7 @@ uv run dvc metrics show
 uv run pytest -q              # 13 tests
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db    # http://127.0.0.1:5000
 
-uv run uvicorn churnops.api:app                              # http://127.0.0.1:8000/docs
+uv run uvicorn churnops.api:app                              # http://127.0.0.1:8015/docs
 uv run churnops drift
 ```
 
@@ -105,7 +105,7 @@ uv run dvc metrics diff
 ### Call the API
 
 ```powershell
-curl -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" -d '[{
+curl -X POST http://127.0.0.1:8015/predict -H "Content-Type: application/json" -d '[{
   "gender": "Female", "SeniorCitizen": 0, "Partner": "Yes", "Dependents": "No",
   "tenure": 2, "PhoneService": "Yes", "MultipleLines": "No",
   "InternetService": "Fiber optic", "OnlineSecurity": "No", "OnlineBackup": "No",
